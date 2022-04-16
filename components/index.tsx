@@ -8,6 +8,7 @@ import {
     IconButton,
     Image,
     Text,
+    useToast,
     View,
 } from "native-base";
 import { useEffect, useState, VFC } from "react";
@@ -19,6 +20,7 @@ const Index: VFC = () => {
     const [type, setType] = useState(Camera.Constants.Type.back);
     const [camera, setCamera] = useState<null | Camera>(null);
     const [pic, setPic] = useState<null | string>(null);
+    const toast = useToast();
 
     const iconSize: number = 12;
 
@@ -37,6 +39,11 @@ const Index: VFC = () => {
             const { status } = await MediaLibrary.requestPermissionsAsync();
             if (status === "granted") {
                 const asset = await MediaLibrary.createAssetAsync(image.uri);
+                toast.show({
+                    title: "save photo",
+                    placement: "bottom",
+                    description: "your photo is successfully saved!",
+                });
             }
         }
     };
