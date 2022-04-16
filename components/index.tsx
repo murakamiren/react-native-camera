@@ -12,6 +12,7 @@ import {
 } from "native-base";
 import { useEffect, useState, VFC } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import * as MediaLibrary from "expo-media-library";
 
 const Index: VFC = () => {
     const [hasPermission, setHasPermission] = useState<null | boolean>(null);
@@ -33,6 +34,10 @@ const Index: VFC = () => {
         if (camera) {
             const image = await camera.takePictureAsync();
             setPic(image.uri);
+            const { status } = await MediaLibrary.requestPermissionsAsync();
+            if (status === "granted") {
+                const asset = await MediaLibrary.createAssetAsync(image.uri);
+            }
         }
     };
 
@@ -79,7 +84,7 @@ const Index: VFC = () => {
                             icon={
                                 <Icon
                                     as={Ionicons}
-                                    name="camera-reverse-outline"
+                                    name="camera-reverse"
                                     size={iconSize}
                                     color="muted.900"
                                 />
