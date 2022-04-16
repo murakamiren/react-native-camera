@@ -1,11 +1,25 @@
 import { Camera } from "expo-camera";
-import { Button, Text, View } from "native-base";
+import {
+    Box,
+    Button,
+    Center,
+    HStack,
+    Icon,
+    IconButton,
+    Image,
+    Text,
+    View,
+} from "native-base";
 import { useEffect, useState, VFC } from "react";
-import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const Index: VFC = () => {
     const [hasPermission, setHasPermission] = useState<null | boolean>(null);
     const [type, setType] = useState(Camera.Constants.Type.back);
+    const [camera, setCamera] = useState<null | Camera>(null);
+    const [pic, setPic] = useState<null | string>(null);
+
+    const iconSize: number = 12;
 
     const handleType = () => {
         setType(
@@ -13,6 +27,17 @@ const Index: VFC = () => {
                 ? Camera.Constants.Type.front
                 : Camera.Constants.Type.back
         );
+    };
+
+    const takePic = async () => {
+        if (camera) {
+            const image = await camera.takePictureAsync();
+            setPic(image.uri);
+        }
+    };
+
+    const backToCamera = () => {
+        setPic(null);
     };
 
     useEffect(() => {
@@ -30,10 +55,66 @@ const Index: VFC = () => {
     }
     return (
         <View flex="1">
-            <Camera type={type} style={{ flex: 1 }} />
-            <View>
-                <Button onPress={handleType}>flip</Button>
-            </View>
+            {!pic ? (
+                <Camera
+                    type={type}
+                    style={{ flex: 1 }}
+                    ref={(ref) => {
+                        setCamera(ref);
+                    }}
+                />
+            ) : (
+                <Image source={{ uri: pic }} alt="cant load image" flex={1} />
+            )}
+            <HStack
+                w="full"
+                h="24"
+                justifyContent="center"
+                alignItems="center"
+                space={24}
+            >
+                {!pic ? (
+                    <>
+                        <IconButton
+                            icon={
+                                <Icon
+                                    as={Ionicons}
+                                    name="camera-reverse-outline"
+                                    size={iconSize}
+                                    color="muted.900"
+                                />
+                            }
+                            onPress={handleType}
+                        />
+                        <IconButton
+                            icon={
+                                <Icon
+                                    as={Ionicons}
+                                    name="camera-outline"
+                                    size={iconSize}
+                                    color="muted.900"
+                                />
+                            }
+                            onPress={takePic}
+                        />
+                    </>
+                ) : (
+                    <Button
+                        bgColor="muted.900"
+                        size="lg"
+                        leftIcon={
+                            <Icon
+                                as={Ionicons}
+                                name="arrow-back-outline"
+                                color="white"
+                            />
+                        }
+                        onPress={backToCamera}
+                    >
+                        back to camera
+                    </Button>
+                )}
+            </HStack>
         </View>
     );
 };
